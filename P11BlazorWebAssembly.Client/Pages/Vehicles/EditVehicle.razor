@@ -1,0 +1,72 @@
+﻿@page "/vehicles/editvehicle/{Id:int}"
+
+@inject IVehicleDealershipService VehicleDealershipService
+@inject ILanguageService LanguageService
+@using Blazored.LocalStorage;
+@using Microsoft.AspNetCore.Components.Authorization;
+@using P06VehicleDealership.Shared.Auth;
+@using P06VehicleDealership.Shared.Services.AuthService;
+@inject IJSRuntime JSRuntime
+@inject ILanguageService LanguageService
+@inject IAuthService AuthService
+@inject ILocalStorageService LocalStorageService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@if (selectedLanguage != null)
+{
+<h3>@LanguageService.GetLanguage(selectedLanguage, "EditVehicleTitle")</h3>
+
+@if (vehicle == null)
+{
+    <p><em>@message</em></p>
+}
+else
+{
+    <VehicleForm vehicle="vehicle" OnValidSubmit="HandleValidSubmit"></VehicleForm>
+    <button class="btn btn-danger" @onclick=HandleDelete>@LanguageService.GetLanguage(selectedLanguage, "DeleteButton")</button>
+}
+}
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private Vehicle vehicle;
+    private string message;
+
+    private string selectedLanguage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        selectedLanguage = await LocalStorageService.GetItemAsync<string>("language") ?? "english";
+
+        var response = await VehicleDealershipService.GetVehicleByIdAsync(Id);
+        if (response.Success)
+        {
+            vehicle = response.Data;
+            message = null;
+        }
+        else
+        {
+            vehicle = null;
+            message = response.Message;
+        }
+    }
+
+    async Task HandleValidSubmit()
+    {
+        var response = await VehicleDealershipService.UpdateVehicleAsync(vehicle);
+        if (response.Success)
+            NavigationManager.NavigateTo("/vehicles/vehiclesList");
+        else
+            message = response.Message;
+    }
+
+    async Task HandleDelete()
+    {
+        var response = await VehicleDealershipService.DeleteVehicleAsync(Id);
+        if (response.Success)
+            NavigationManager.NavigateTo("/vehicles/vehiclesList");
+        else
+            message = response.Message;
+    }
+}

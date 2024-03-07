@@ -1,0 +1,21 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+    <system:String x:Key="Login">Login</system:String>
+    <system:String x:Key="OpenVehicleDealership">Browse vehicles</system:String>
+    <system:String x:Key="ChangeTheme">Change theme</system:String>
+    <system:String x:Key="ChangeLanguage">Change language</system:String>
+        <system:String x:Key="Password">Password:</system:String>
+    <system:String x:Key="NewVehicle">New vehicle</system:String>
+    <system:String x:Key="PrevPage">Previous page</system:String>
+<system:String x:Key="NextPage">Next page</system:String>
+<system:String x:Key="PageNumber">Page number :</system:String>
+<system:String x:Key="CurrentPage">Current page :</system:String>
+<system:String x:Key="EditVehicle">Edit</system:String>
+<system:String x:Key="SaveVehicle">Save</system:String>
+<system:String x:Key="DeleteVehicle">Delete</system:String>
+<system:String x:Key="Fuel">Fuel:</system:String>
+<system:String x:Key="LoggedIn">Logged in successfully!</system:String>
+
+
+</ResourceDictionary>

@@ -1,0 +1,73 @@
+@page "/settings"
+@using Blazored.LocalStorage
+@using Microsoft.AspNetCore.Components.Web.Extensions
+
+@inject ILanguageService LanguageService
+@inject IJSRuntime JSRuntime
+@inject ILocalStorageService LocalStorage
+
+@if (selectedLanguage != null)
+{
+    <div class="container">
+        <h3>@LanguageService.GetLanguage(selectedLanguage, "SettingsTitle")</h3>
+        <div>
+            <p>>@LanguageService.GetLanguage(selectedLanguage, "ChooseTheme"):</p>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="themeSwitch" @bind="isDarkTheme" @oninput="ToggleTheme" />
+                <label class="form-check-label" for="themeSwitch">@GetThemeLabel()</label>
+            </div>
+        </div>
+        <hr class="separator" />
+        <div>
+            <p>>@LanguageService.GetLanguage(selectedLanguage, "ChooseLanguageLabel"):</p>
+            <select class="form-control" @bind="language">
+                <option value="polski">@LanguageService.GetLanguage(selectedLanguage, "PolishOption")</option>
+                <option value="english">@LanguageService.GetLanguage(selectedLanguage, "EnglishOption")</option>
+            </select>
+            <button class="btn btn-primary mt-3" @onclick="SaveLanguage">@LanguageService.GetLanguage(selectedLanguage, "SaveButton")</button>
+        </div>
+
+    </div>
+}
+
+@code {
+    private string language;
+    private string selectedLanguage;
+    private bool isDarkTheme;
+    private string selectedTheme;
+
+    protected override async Task OnInitializedAsync()
+    {
+        selectedLanguage = await LocalStorage.GetItemAsync<string>("language") ?? "english";
+        language = selectedLanguage;
+        
+        selectedTheme = await LocalStorage.GetItemAsync<string>("theme") ?? "light";
+        isDarkTheme = selectedTheme == "dark";
+
+        // Set the initial theme using JSInterop
+        await JSRuntime.InvokeVoidAsync("themeSwitcher.setTheme", selectedTheme);
+    }
+
+    private async Task SaveLanguage()
+    {
+        MainLayout.Language = language;
+        await LocalStorage.SetItemAsync("language", MainLayout.Language);
+        JSRuntime.InvokeVoidAsync("location.reload");
+    }
+
+    private async Task ToggleTheme()
+    {
+        isDarkTheme = !isDarkTheme;
+        selectedTheme = isDarkTheme ? "dark" : "light";
+        await LocalStorage.SetItemAsync("theme", selectedTheme);
+        await JSRuntime.InvokeVoidAsync("themeSwitcher.setTheme", selectedTheme);
+    }
+
+    private string GetThemeLabel()
+    {
+        if(selectedLanguage == "english")
+        return isDarkTheme ? "Dark Theme" : "Light Theme";
+
+        return isDarkTheme ? "Tryb ciemny" : "Tryb jasny";
+    }
+}
